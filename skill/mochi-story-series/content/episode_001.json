@@ -1,0 +1,26 @@
+[
+  {
+    "id": "001",
+    "date": "2026-03-29",
+    "story_theme": "A lonely worker finds a moment of quiet relief at dawn/dusk.",
+    "storyboard_description": "A 3-panel cinematic storyboard: 1. A cluttered office desk with a dramatic orange sunset view through floor-to-ceiling windows. 2. A close-up of a keyboard and monitor glowing with an Excel spreadsheet. 3. Mochi sitting on the floor in front of a convenience store freezer at night with a blue-and-white glow.",
+    "panels": [
+      {
+        "index": 1,
+        "text": "晚霞挺美的，\n但你好像，还是不敢下班。",
+        "mochi_pos": "center-left"
+      },
+      {
+        "index": 2,
+        "text": "手指悬在那个绿色的'通过'图标上，\n怎么也点不下去。\n好像只要它还亮着，\n我就还是那个'有用'的人。",
+        "mochi_pos": "center"
+      },
+      {
+        "index": 3,
+        "text": "在这一分钟里，\n我谁也不是。\n我，只是我自己。\n去买个冰激凌吧。",
+        "mochi_pos": "lower-right"
+      }
+    ],
+    "caption": "**你的价值，不需要被谁“通过”**\n\n我们好像从很久以前，就开始习惯用“优秀”来换取一点点的安全感。\n以为只要自己足够有用，哪怕在写字楼里待得再晚，也总归是有个稳当的位置的。\n\n这种习惯慢慢变成了一种本能。以至于对着漫天的晚霞，却发现自己连停下来看两分钟，都会觉得莫名地心虚。\n\n我们一直在等别人点头，等考核通过，等那些能证明我们价值的代码、文档或是回复。\n但其实，那个最疲惫的你，并不需要这些。\n他只是想找个地方歇歇，或者在那一分钟里，哪怕只是奖励自己一口小小的甜。\n\n今晚，试试把那个“完美的角色”先留在工位上吧。\n陪 Mochi 坐一会，或者去便利店挑个喜欢的味道。\n不用等别人来“通过”，那是一份只属于你自己的犒赏。\n\n不赶路了，好吗？\n\n---\nMochi ｜ 把情绪轻轻放下\n#大厂打工人 #治愈系文案 #下班 #我的私藏治愈瞬间 #深呼吸 #Mochi #情绪价值 #给自己的一封信"
+  }
+]
