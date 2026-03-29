@@ -1,0 +1,13 @@
+api_key*
+test_output.jpg
+*.env
+output/
+temp
+.gemini/
+.agents/
+_agents/
+.agent/
+_agent/
+node_modules/
+dist/
+build/
