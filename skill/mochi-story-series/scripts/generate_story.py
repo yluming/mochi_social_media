@@ -79,7 +79,20 @@ def img_to_data_uri(path: str, max_size_mb: float = 0.5) -> tuple[str, str]:
     return f"data:image/jpeg;base64,{b64}", "image/jpeg"
 
 
-def call_image_api(api_key: str, prompt: str, ref_paths: list[str] = None,
+def get_unique_path(path: Path) -> Path:
+    """If file exists, append _1, _2... etc."""
+    if not path.exists():
+        return path
+    parent = path.parent
+    stem = path.stem
+    suffix = path.suffix
+    counter = 1
+    while (parent / f"{stem}_{counter}{suffix}").exists():
+        counter += 1
+    return parent / f"{stem}_{counter}{suffix}"
+
+
+def call_image_api(api_key: str, prompt: str, ref_paths: list = None,
                    max_retries: int = 5, retry_delay: float = 15.0) -> bytes:
     hdrs = {
         "Content-Type": "application/json",
@@ -122,7 +135,8 @@ def call_image_api(api_key: str, prompt: str, ref_paths: list[str] = None,
             
             data_list = result.get("data")
             if not data_list or not isinstance(data_list, list) or len(data_list) == 0:
-                raise RuntimeError(f"API returned empty or invalid data list: {result.get('message', 'No message')}")
+                print(f"   [debug] Full Response: {resp.text}")
+                raise RuntimeError(f"API returned empty or invalid data list: {resp.text}")
 
             b64_data = data_list[0].get("b64_json")
             if not b64_data:
@@ -141,53 +155,63 @@ def call_image_api(api_key: str, prompt: str, ref_paths: list[str] = None,
 # ─────────────────────────────────────────────────────────────
 
 def build_master_storyboard_prompt(episode: dict) -> str:
-    title_text = episode.get("cover_title", "")
     story_theme = episode.get("story_theme", "")
     layout_desc = episode.get("storyboard_description", "")
+    panels      = episode.get("panels", [])
     
     panels_info = ""
-    for p in episode.get("panels", []):
+    for p in panels:
         idx = p.get("index", "?")
         txt = p.get("text", "").replace("\n", " ")
-        panels_info += f"Panel {idx} Chinese text overlay: 「{txt}」. "
+        panels_info += f"Panel {idx} Chinese text: {txt}. "
 
+    # Typography Extraction & Unified Cohesion
     return (
-        "You are a professional cinematic storyboard artist. "
-        f"Generate a single 3:4 storyboard image with 3 horizontal panels. "
+        "You are a visionary cinematic graphic designer and colorist. "
+        "Generate a single 3:4 vertical image consisting of 3 horizontal cinematic panels. "
+        "IMPORTANT: Seamless borderless layout. NO black bars, no frames. "
+        
+        # Color Grading & Atmosphere
+        "VISUAL STYLE: Unified cinematic color grading. Use soft, natural light transitions. "
+        "Maintain a lower-saturation, high-end film-stock aesthetic. "
+        "Atmosphere should be quiet, clean, and highly sophisticated. "
+        
         f"Overall story theme: {story_theme}. "
         f"Detailed panel descriptions: {layout_desc}. "
         
-        # References instruction
-        "Reference 1 (Mochi character): Reproduce this exact character in all panels. "
-        "Reference 2 (Visual style): Match this cinematic 3D CG lighting and rendering quality. "
-        "Reference 3 (Layout): Match this 3-panel vertical stack layout with thin black separators. "
+        # References
+        "Reference 1 (Mochi character): Reproduce this exact character. "
+        "Reference 2 (Visual style): Match the film-stock texture and atmosphere. "
+        "Reference 3 (Layout Style): Match the typography placement and artistic feel. "
         
-        # Text instructions
-        f"Overlay the following Chinese text on the panels as shown in Reference 3. "
-        "Use a casual, handwritten-style font, similar to the reference. "
-        f"Panel 1 Title: 「{title_text}」. "
+        # Typography Style, Extraction & Unified Cohesion
+        "CRITICAL TYPOGRAPHY INSTRUCTION: Use a CASUAL, ARTISTIC HANDWRITTEN STYLE font for all text, mimicking the brush strokes in Reference 3. "
+        "Establish a UNIFIED PRIMARY COLOR for all text. Extract this color organically from the scene's dominant cinematic highlights (e.g., a warm pearl, soft champagne, or muted neutral from the environmental light). "
+        "Panel 1: MAIN TITLE. This should be larger, bold, and more prominent, reflecting the core theme. "
+        "Panels 2 & 3: NARRATIVE CAPTIONS. These use the same font and color but must be smaller and more understated, like gentle cinematic subtitles. "
+        "NO BRACKETS, NO QUOTES around the Chinese text. "
         f"{panels_info}"
         
-        "Ensure the text is legible and artistically integrated into the scenes."
+        "The final result must combine high-end artistic handwriting with light-distilled colors for a cohesive, soulful aesthetic."
     )
 
 
 def build_expansion_prompt(strip_index: int, panel_data: dict, story_theme: str) -> str:
-    original_text = panel_data.get("text", "").replace("\n", " ")
-    mochi_pos = panel_data.get("mochi_pos", "center")
-    
+    # Use the context to help the AI understand WHAT it is expanding.
+    context = panel_data.get("text", "").replace("\n", " ")
     return (
-        "You are a cinematic concept artist. "
-        "Reference 1 (Cinematic Source): This is a horizontal movie-style fragment of a scene. "
-        "Reference 2 (Character): Maintain this exact character appearance. "
-        "Reference 3 (Style): Match this cinematic CG rendering quality. "
+        "You are a high-fidelity image restoration and expansion artist. "
+        f"Context of the scene: {context} (Theme: {story_theme}). "
+        "Reference 1 (Source Strip): This is your ONLY DEFINITIVE source for content, character, and style. "
         
-        # Generation task
-        "Generate a SINGLE-PANEL full 3:4 vertical cinematic illustration. "
-        "IMPORTANT: This is NOT a storyboard. DO NOT create multiple panels, borders, or split-screens. "
-        "Use the horizontal composition from Reference 1 as your core content. "
-        "Extend the background upward and downward naturally to fill the entire 3:4 frame. "
-        "The final image must be a continuous, single-perspective cinematic environment with NO text."
+        # Expansion task
+        "Generate a full 3:4 vertical cinematic illustration by expanding Reference 1. "
+        "IMPORTANT: You MUST maintain 100% visual consistency with the subjects (Mochi), lighting, and colors in the center strip. "
+        "Extend the background (top and bottom) seamlessly while keeping the center identical. "
+        
+        # Removal task
+        "CRITICAL: CLEANLY REMOVE all text overlays. The final image must be a PURE cinematic scene. "
+        "No text, no watermarks, no split screens. Just one continuous, high-quality cinematic environment."
     )
 
 
@@ -200,8 +224,10 @@ def main():
     parser.add_argument("--content_file", required=True)
     parser.add_argument("--date", default=None)
     parser.add_argument("--api_key_path", default=None)
-    parser.add_argument("--force_all", action="store_true", help="Ignore existing files")
+    parser.add_argument("--force_all", action="store_true", help="Ignore existing scene files")
     parser.add_argument("--scene_index", type=int, default=0, help="Only generate/retry a specific scene (1, 2, or 3)")
+    parser.add_argument("--storyboard_only", action="store_true", help="Stop after generating the master storyboard")
+    parser.add_argument("--new_storyboard", action="store_true", help="Force regenerate the master storyboard")
     args = parser.parse_args()
 
     # ── API Key ──
@@ -219,22 +245,32 @@ def main():
     with open(args.content_file, encoding="utf-8") as f:
         episode = json.load(f)[0] # simplified for demo
     ep_date = episode.get("date", date.today().strftime("%Y-%m-%d"))
+    if args.date:
+        ep_date = args.date
     out_dir = SKILL_DIR / "output" / ep_date
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # ── Step 1: Generate Master Storyboard ──
     sb_path = out_dir / "storyboard.jpg"
-    if not sb_path.exists() or args.force_all:
-        print("[1/2] Generating Master Storyboard (storyboard.jpg)...")
+    
+    target_sb_path = sb_path
+    if sb_path.exists() and not args.new_storyboard:
+        print("[*] Found existing storyboard.jpg, using it.")
+    else:
+        if sb_path.exists():
+             target_sb_path = get_unique_path(sb_path)
+
+        print(f"[1/2] Generating Master Storyboard ({target_sb_path.name})...")
         prompt = build_master_storyboard_prompt(episode)
         refs = [str(REFS_DIR / REF_MOCHI), str(REFS_DIR / REF_STYLE), str(REFS_DIR / REF_STORYBOARD)]
         img_bytes = call_image_api(api_key, prompt, ref_paths=refs)
-        sb_path.write_bytes(img_bytes)
-        print(f"   OK: storyboard.jpg ({len(img_bytes)//1024} KB)")
-        print("   [cooldown] Waiting 15s before next phase...\n")
-        time.sleep(15)
-    else:
-        print("[*] Found existing storyboard.jpg, skipping Step 1.")
+        target_sb_path.write_bytes(img_bytes)
+        print(f"   OK: {target_sb_path.name} ({len(img_bytes)//1024} KB)")
+        sb_path = target_sb_path # Use this version for subsequent steps
+    
+    if args.storyboard_only:
+        print("\n[!] --storyboard_only set. Exiting.")
+        sys.exit(0)
 
     # ── Step 2: Physical Cropping into Strips ──
     from PIL import Image
@@ -262,17 +298,19 @@ def main():
             continue
 
         scene_path = out_dir / f"scene_{idx}.jpg"
-        if scene_path.exists() and not args.force_all and args.scene_index == 0:
-            print(f"[*] Found existing scene_{idx}.jpg, skipping.")
-            continue
-            
-        print(f"[2/2] Expanding strip {idx} for scene_{idx}.jpg (No text)...")
+        target_scene_path = get_unique_path(scene_path)
+        
+        print(f"[2/2] Expanding strip {idx} for {target_scene_path.name} (No text)...")
         prompt = build_expansion_prompt(idx, p_data, story_theme)
-        # Ref 1: The cropped strip. Ref 2: Mochi char. Ref 3: Style
-        refs = [str(s_path), str(REFS_DIR / REF_MOCHI), str(REFS_DIR / REF_STYLE)]
+        # ONLY use the strip as reference to avoid model confusion and visual drift!
+        refs = [str(s_path)] 
+        # Fallback context if needed
+        if idx == 3:
+            refs = [str(s_path), str(REFS_DIR / REF_MOCHI), str(REFS_DIR / REF_STYLE)]
+            
         img_bytes = call_image_api(api_key, prompt, ref_paths=refs)
-        scene_path.write_bytes(img_bytes)
-        print(f"   OK: scene_{idx}.jpg ({len(img_bytes)//1024} KB)")
+        target_scene_path.write_bytes(img_bytes)
+        print(f"   OK: {target_scene_path.name} ({len(img_bytes)//1024} KB)")
         
         if idx < 3:
             print("   [cooldown] Waiting 15s before next request...\n")

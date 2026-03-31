@@ -30,7 +30,31 @@
 | **09** | **平庸的恐惧** | 承认自己是一个“普通人”，到底有多难？ | 针对精英主义滤镜的“清澈注视”。 |
 | **10** | **微小的锚点** | 找回灵魂，只需要 10 分钟的“无意义”。 | 所有的刺破，最终都要落回到具体的、微小的接住。 |
 
-## 4. 视觉与剧本规范 (Visual & Scripting Specs)
+## 4. 视觉与剧本规范
+
+## Visual Narrative Logic (分镜叙事逻辑)
+
+1. **Perspective First (视角优先)**:
+   - Use POV (Point of View) or environment-first wide shots for the first two panels. Create the "field" (场域) of the user's emotion.
+   - Reveal Mochi in the final panel as a source of acceptance and quiet resolution.
+
+2. **Negative Space (广角与留白)**:
+   - Keep Mochi's visual size under 10% of the frame in wide shots. 
+   - Use vast shadows or empty floors to mirror the "breathable" nature of the soul. Avoid visual clutter.
+
+3. **Spatial & Emotional Resolution (空间与情绪的落地)**:
+   - **Contraction (紧)**: Panel 1/2. Use light and composition to create a sense of being "looked at" or "stuck". This can be sharp shadows, invasive screen light, or cramped framing.
+   - **Resolution (落)**: Panel 3. Provide relief through two possible paths:
+     - **Path A: Vastness (开阔)**: Use diffused light, large negative space, or wide horizons to dissolve pressure and create "breathing room".
+     - **Path B: Intimacy (烟火气/归宿)**: Use a warm "sensory anchor"—a glowing convenience store, a steaming cup, or a small treat (like the ice cream in Ep 001). The background remains simple, but the focus is on a concrete, warm, and comforting moment.
+
+4. **Incidental Reality (偶然的真实)**:
+   - **Prop Neutrality**: Props should not be "symbols" but "incidents". They should be items that naturally belong in the scene (a coffee stain, unread books, bits of morning debris).
+   - **Indirect Suggestion**: Emotion is echoed by the *texture* or *placement* of objects, not their literal meaning. Avoid forced "healing" symbols.
+
+5. **Humanity over Perfection (去粉饰的真实)**:
+   - The scene should look like a movie fragment, not a sanitized commercial. Small bits of mess, soft focus, and natural textures are preferred.
+
 *   **Mochi 位格唯一性**：在所有剧本（Episode）的视觉描述中，**Mochi 是唯一的行动主体**。
 *   **严禁表述**：严禁在 `storyboard_description` 中使用 "the person", "the user", "a student" 等抽象词汇。
 *   **文案克制律 (Concision Law)**：每页文字严格控制在 **10-20 字**。不解释、不推导，只给镜像。
